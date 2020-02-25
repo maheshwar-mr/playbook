@@ -38,3 +38,6 @@
 - name: Print Jenkins Initial Password
   debug:
     var: result.stdout
+    
+ - name: Enable Firewall and Allow 8080
+   shell: ufw enable && ufw allow 8080
