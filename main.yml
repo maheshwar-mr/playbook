@@ -24,7 +24,7 @@
     name=jenkins
     update_cache=yes
 
-- name: Start and EnableJenkins
+- name: Start and Enable Jenkins
   service:
     name=jenkins
     state=started
