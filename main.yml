@@ -11,9 +11,9 @@
 
 - name: download jenkins.repo
   get_url:
-    url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
-    dest: /etc/yum.repos.d/jenkins.repo
-
+    url:  http://pkg.jenkinsci.org/redhat/jenkins.repo
+    dest: /etc/apt/sources.list.d/jenkins.list
+    
 - name: import jenkins key
   rpm_key:
     state: present
