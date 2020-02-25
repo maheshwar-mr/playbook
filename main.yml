@@ -1,47 +1,44 @@
 ---
-- hosts: jenkins
-  become: yes
-  tasks:
-    - name: Install wget
-      apt:
-        name: wget
-        state: present
+- name: Install wget
+  apt:
+    name: wget
+    state: present
 
-    - name: Install openjdk
-      apt:
-        name: default-jdk
-        state: present
+- name: Install openjdk
+  apt:
+    name: default-jdk
+    state: present
 
-    - name: Install Jenkins apt repository key
-      apt_key:
-        url=https://pkg.jenkins.io/debian-stable/jenkins.io.key
-        state=present
+- name: Install Jenkins apt repository key
+  apt_key:
+    url=https://pkg.jenkins.io/debian-stable/jenkins.io.key
+    state=present
 
-    - name: Configure repository
-      apt_repository:
-        repo='deb https://pkg.jenkins.io/debian-stable binary/'
-        state=present
+- name: Configure repository
+  apt_repository:
+    repo='deb https://pkg.jenkins.io/debian-stable binary/'
+    state=present
 
-    - name: Install Jenkins
-      apt:
-        name=jenkins
-        update_cache=yes
+- name: Install Jenkins
+  apt:
+    name=jenkins
+    update_cache=yes
 
-    - name: Start Jenkins
-      service:
-        name=jenkins
-        state=started
+- name: Start Jenkins
+  service:
+    name=jenkins
+    state=started
 
-    - name: Enable Jenkins
-      systemd:
-        name=jenkins
-        enaled=yes
+- name: Enable Jenkins
+  systemd:
+    name=jenkins
+    enaled=yes
 
-    - name: Jenkins Initial Password
-      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
-      changed_when: false
-      register: result
+- name: Jenkins Initial Password
+  shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+  changed_when: false
+  register: result
 
-    - name: Print Jenkins Initial Password
-      debug:
-        var: result.stdout
+- name: Print Jenkins Initial Password
+  debug:
+    var: result.stdout
