@@ -24,15 +24,11 @@
     name=jenkins
     update_cache=yes
 
-- name: Start Jenkins
+- name: Start and EnableJenkins
   service:
     name=jenkins
     state=started
-
-- name: Enable Jenkins
-  systemd:
-    name=jenkins
-    enaled=yes
+    enabled=yes
 
 - name: Jenkins Initial Password
   shell: cat /var/lib/jenkins/secrets/initialAdminPassword
