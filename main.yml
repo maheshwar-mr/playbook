@@ -47,3 +47,8 @@
   ufw:
     rule: allow
     port: '8080'
+    
+- name: Allow OpenSSH
+  ufw:
+    rule: allow
+    name: OpenSSH
