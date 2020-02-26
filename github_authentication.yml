@@ -5,7 +5,7 @@
   
     - name: Install plugin
       jenkins_plugin:
-        name: github-authentication
+        name: github-oauth
         url: http://localhost:8080
         url_username: admin
         url_password: admin
