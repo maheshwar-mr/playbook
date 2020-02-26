@@ -1,13 +1,11 @@
 ---
 - hosts: jenkins
   become: yes
-  tasks:
-  
-    jenkins_params:
+  vars:
       jenkins_url: http://localhost:8080
       jenkins_username: admin
       jenkins_password: admin
-  
+  tasks:
     - name: Install Github Authentication Plugin
       jenkins_plugin:
         name: github-oauth
