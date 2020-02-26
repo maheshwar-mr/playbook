@@ -3,12 +3,24 @@
   become: yes
   tasks:
   
-    - name: Install plugin
+    jenkins_params:
+      jenkins_url: http://localhost:8080
+      jenkins_username: admin
+      jenkins_password: admin
+  
+    - name: Install Github Authentication Plugin
       jenkins_plugin:
         name: github-oauth
-        url: http://localhost:8080
-        url_username: admin
-        url_password: admin
+        url: {{ jenkins_url }}
+        url_username: {{ jenkins_username }}
+        url_password: {{ jenkins_password }}
+        
+    - name: Install Job DSL Plugin
+      jenkins_plugin:
+        name: job-dsl
+        url: {{ jenkins_url }}
+        url_username: {{ jenkins_username }}
+        url_password: {{ jenkins_password }}
     
     - name: Restart Jenkins
       service:
