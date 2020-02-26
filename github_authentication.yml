@@ -2,6 +2,14 @@
 - hosts: jenkins
   become: yes
   tasks:
+    - name: Stop Jenkins
+      service:
+        state: stopped
+        
     - name: Install plugin
       jenkins_plugin:
         name: github-authentication
+    
+    - name: Start Jenkins
+      service:
+        state: started
