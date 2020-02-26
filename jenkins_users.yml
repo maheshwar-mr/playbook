@@ -1,0 +1,12 @@
+---
+- hosts: jenkins
+  become: true
+  tasks:
+  - jenkins_users:
+    - username: 'temp'
+      full_name: 'Temp'
+      email: 'temp@temp.com'
+      password: 'temp'
+      roles: 
+       - 'jenkins-administer'
+      public_keys: []
