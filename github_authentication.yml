@@ -1,0 +1,7 @@
+---
+- hosts: jenkins
+  become: yes
+  tasks:
+    - name: Install plugin
+      jenkins_plugin:
+        name: github-authentication
