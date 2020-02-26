@@ -4,6 +4,7 @@
   tasks:
     - name: Stop Jenkins
       service:
+        name: jenkins
         state: stopped
         
     - name: Install plugin
@@ -12,4 +13,5 @@
     
     - name: Start Jenkins
       service:
+        name: jenkins
         state: started
