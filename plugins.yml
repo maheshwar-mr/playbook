@@ -5,20 +5,21 @@
       jenkins_url: http://localhost:8080
       jenkins_username: admin
       jenkins_password: admin
+      
   tasks:
     - name: Install Github Authentication Plugin
       jenkins_plugin:
         name: github-oauth
-        url: {{ jenkins_url }}
-        url_username: {{ jenkins_username }}
-        url_password: {{ jenkins_password }}
+        url: "{{ jenkins_url }}"
+        url_username: "{{ jenkins_username }}"
+        url_password: "{{ jenkins_password }}"
         
     - name: Install Job DSL Plugin
       jenkins_plugin:
         name: job-dsl
-        url: {{ jenkins_url }}
-        url_username: {{ jenkins_username }}
-        url_password: {{ jenkins_password }}
+        url: "{{ jenkins_url }}"
+        url_username: "{{ jenkins_username }}"
+        url_password: "{{ jenkins_password }}"
     
     - name: Restart Jenkins
       service:
