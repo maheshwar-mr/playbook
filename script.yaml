@@ -76,6 +76,6 @@
       jenkins_script:
         script: "{{ maven_config }}"
         url: "{{ jenkins_url }}"
-        url_username: "{{ jenkins_username }}"
-        url_password: "{{ jenkins_password }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
        
