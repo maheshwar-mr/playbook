@@ -10,11 +10,11 @@
     - name: Configure SonarQube Scanner
       vars:
         sonar_config: |
-          import hudson.model.*
-          import jenkins.model.*
-          import hudson.plugins.sonar.*
-          import hudson.plugins.sonar.model.TriggersConfig
-          import hudson.tools.*
+          import hudson.model.*;
+          import jenkins.model.*;
+          import hudson.plugins.sonar.*;
+          import hudson.plugins.sonar.model.TriggersConfig;
+          import hudson.tools.*;
 
           def sonar_name = "sonarqube"
           def sonar_server_url = "<sonarqube-server-url>"
