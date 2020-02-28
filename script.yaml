@@ -72,7 +72,7 @@
 
               // Save the state
               instance.save()
-          }
+              
       jenkins_script:
         script: "{{ maven_config }}"
         url: "{{ jenkins_url }}"
