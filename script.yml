@@ -66,6 +66,7 @@
                       maven_installations += maven_inst
                   }
               }
+          }
 
               desc_MavenTool.setInstallations((MavenInstallation[]) maven_installations)
               desc_MavenTool.save()
