@@ -7,7 +7,7 @@
     jenkins_password: admin
     
   tasks:
-    - name: Configure SonarQube Scanner
+    - name: Configure Sonar
       vars:
         sonar_config: |
           import hudson.model.*;
