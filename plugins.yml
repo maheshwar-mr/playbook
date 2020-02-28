@@ -20,6 +20,20 @@
         url: "{{ jenkins_url }}"
         url_username: "{{ jenkins_username }}"
         url_password: "{{ jenkins_password }}"
+        
+    - name: Install SonarQube Scanner Plugin
+      jenkins_plugin:
+        name: sonar
+        url: "{{ jenkins_url }}"
+        url_username: "{{ jenkins_username }}"
+        url_password: "{{ jenkins_password }}"
+        
+    - name: Install Nexus Artifact Uploader Plugin
+      jenkins_plugin:
+        name: nexus-artifact-uploader
+        url: "{{ jenkins_url }}"
+        url_username: "{{ jenkins_username }}"
+        url_password: "{{ jenkins_password }}"
     
     - name: Restart Jenkins
       service:
