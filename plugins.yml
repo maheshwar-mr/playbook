@@ -34,7 +34,14 @@
         url: "{{ jenkins_url }}"
         url_username: "{{ jenkins_username }}"
         url_password: "{{ jenkins_password }}"
-    
+
+    - name: Install Configuration as Code Plugin
+      jenkins_plugin:
+        name: configuration-as-code
+        url: "{{ jenkins_url }}"
+        url_username: "{{ jenkins_username }}"
+        url_password: "{{ jenkins_password }}"
+
     - name: Restart Jenkins
       service:
         name: jenkins
