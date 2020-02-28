@@ -11,13 +11,17 @@
   tasks:
     - name: Configure Maven
       vars:
-        maven_version: 3.6.3
         maven_config: |
           import hudson.model.*;
           import jenkins.model.*;
           import hudson.tools.*;
           import hudson.tasks.Maven.MavenInstaller;
           import hudson.tasks.Maven.MavenInstallation;
+
+          // Check if enabled
+          def env = System.getenv()
+       
+          MAVEN_VERSION=3.6.3
 
           def maven_version = env['MAVEN_VERSION']
           def maven_version_list = maven_version.split(',')
@@ -66,14 +70,14 @@
                       maven_installations += maven_inst
                   }
               }
-          }
 
               desc_MavenTool.setInstallations((MavenInstallation[]) maven_installations)
               desc_MavenTool.save()
 
               // Save the state
               instance.save()
-              
+          }
+        
       jenkins_script:
         script: "{{ maven_config }}"
         url: "{{ jenkins_url }}"
