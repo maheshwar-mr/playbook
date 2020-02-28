@@ -47,7 +47,7 @@
 
                   def maven_inst = new MavenInstallation(
                     name, // Name
-                    "", // Home
+                    "/usr/local", // Home
                     [installSourceProperty]
                   )
 
