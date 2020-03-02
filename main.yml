@@ -1,54 +1,59 @@
 ---
-- name: Install wget
-  apt:
-    name: wget
-    state: present
 
-- name: Install openjdk
-  apt:
-    name: default-jdk
-    state: present
+- hosts: new_jenkins
+  become: yes
+  tasks:
+  
+  - name: Install wget
+    apt:
+      name: wget
+      state: present
 
-- name: Install Jenkins apt repository key
-  apt_key:
-    url=https://pkg.jenkins.io/debian-stable/jenkins.io.key
-    state=present
+  - name: Install openjdk
+    apt:
+      name: default-jdk
+      state: present
 
-- name: Configure repository
-  apt_repository:
-    repo='deb https://pkg.jenkins.io/debian-stable binary/'
-    state=present
+  - name: Install Jenkins apt repository key
+    apt_key:
+      url=https://pkg.jenkins.io/debian-stable/jenkins.io.key
+      state=present
 
-- name: Install Jenkins
-  apt:
-    name=jenkins
-    update_cache=yes
+  - name: Configure repository
+    apt_repository:
+      repo='deb https://pkg.jenkins.io/debian-stable binary/'
+      state=present
 
-- name: Start and Enable Jenkins
-  service:
-    name=jenkins
-    state=started
-    enabled=yes
+  - name: Install Jenkins
+    apt:
+      name=jenkins
+      update_cache=yes
 
-- name: Jenkins Initial Password
-  shell: cat /var/lib/jenkins/secrets/initialAdminPassword
-  changed_when: false
-  register: result
+  - name: Start and Enable Jenkins
+    service:
+      name=jenkins
+      state=started
+      enabled=yes
 
-- name: Print Jenkins Initial Password
-  debug:
-    var: result.stdout
-    
-- name: Enable Firewall
-  ufw:
-    state: enabled
-    
-- name: Allow Port 8080
-  ufw:
-    rule: allow
-    port: '8080'
-    
-- name: Allow OpenSSH
-  ufw:
-    rule: allow
-    name: OpenSSH
+  - name: Jenkins Initial Password
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    changed_when: false
+    register: result
+
+  - name: Print Jenkins Initial Password
+    debug:
+      var: result.stdout
+
+  - name: Enable Firewall
+    ufw:
+      state: enabled
+
+  - name: Allow Port 8080
+    ufw:
+      rule: allow
+      port: '8080'
+
+  - name: Allow OpenSSH
+    ufw:
+      rule: allow
+      name: OpenSSH
