@@ -1,0 +1,38 @@
+---
+- hosts: jenkins
+  become: yes
+  vars:
+    jenkins_url: http://localhost:8080
+    jenkins_username: admin 
+    jenkins_password: admin
+    sonarScannerName: sonar
+    maven_config: |
+        import hudson.tasks.Maven.MavenInstallation;
+        import hudson.tools.InstallSourceProperty;
+        import hudson.tools.ToolProperty;
+        import hudson.tools.ToolPropertyDescriptor;
+        import hudson.util.DescribableList;
+
+        def mavenDesc = jenkins.model.Jenkins.instance.getExtensionList(hudson.tasks.Maven.DescriptorImpl.class)[0]
+
+        def isp = new InstallSourceProperty()
+        def autoInstaller = new hudson.tasks.Maven.MavenInstaller("3.6a.3")
+        isp.installers.add(autoInstaller)
+
+        def proplist = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>()
+        proplist.add(isp)
+
+        def installation = new MavenInstallation("maven", "", proplist)
+
+        mavenDesc.setInstallations(installation)
+        mavenDesc.save()
+    
+    
+  tasks:
+    - name: Configure Maven     
+      jenkins_script:
+        script: "{{ maven_config }}"
+        url: "{{ jenkins_url }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
+       
