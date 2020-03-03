@@ -1,0 +1,15 @@
+---
+- hosts: new_jenkins
+  become: true
+  vars: 
+    jenkins_url: http://localhost:8080
+    jenkins_user: admin
+    jenkins_password: admin
+  tasks:
+  - name: Download CLI jar
+    get_url:
+      url: http://localhost:8080/jnlpJars/jenkins-cli.jar
+      dest: /opt/jenkins-cli.jar
+      
+  - name: Install Suggested Plugins
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin git
