@@ -2,7 +2,7 @@
 - hosts: new_jenkins
   become: true
   vars:
-    job_name: seed
+    job_name: demo
     jenkins_url: http://localhost:8080
     jenkins_user: admin
     jenkins_password: admin
@@ -16,9 +16,9 @@
 
       // parameters
       def jobParameters = [
-        name:          'Demo',
+        name:          "{{ job_name }}",
         description:   '',
-        repository:    'git@github.com:my-company/my-repo.git',
+        repository:    "{{ git repository }}",
         branch:        'master',
       ]
 
