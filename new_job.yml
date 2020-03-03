@@ -52,10 +52,11 @@
       // save to disk
       jenkins.save()
       jenkins.reload()
-    
-  jenkins_script:
-    script: "{{ init_job_script }}"
-    url: "{{ jenkins_url }}"
-    user: "{{ jenkins_user }}"
-    password: "{{ jenkins_password }}"
-    
+      
+  tasks:
+  - name: Creating a new Pipeline Job
+    jenkins_script:
+      script: "{{ init_job_script }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_user }}"
+      password: "{{ jenkins_password }}"
