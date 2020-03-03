@@ -34,14 +34,14 @@
       user: "{{ jenkins_user }}"
       password: "{{ jenkins_password }}"
 
-    - name: Install Suggested Plugins
-      shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader
-    
-    - name: Pause for Plugins to Install
-      pause:
-        minutes: 5
-    
-    - name: Restart Jenkins
-      service:
-        name: jenkins
-        state: restarted
+  - name: Install Suggested Plugins
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader
+
+  - name: Pause for Plugins to Install
+    pause:
+      minutes: 5
+
+  - name: Restart Jenkins
+    service:
+      name: jenkins
+      state: restarted
