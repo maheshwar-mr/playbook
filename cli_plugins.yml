@@ -12,4 +12,4 @@
       dest: /opt/jenkins-cli.jar
       
   - name: Install Suggested Plugins
-    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" -auth "{{ jenkins_user }}":"{{ jenkins_password }}" -noKeyAuth install-plugin git github-oauth -restart
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" -auth "{{ jenkins_user }}":"{{ jenkins_password }}" -noKeyAuth install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader -restart
