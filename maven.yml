@@ -1,5 +1,5 @@
 ---
-- hosts: jenkins
+- hosts: new_jenkins
   become: yes
   vars:
     jenkins_url: http://localhost:8080
