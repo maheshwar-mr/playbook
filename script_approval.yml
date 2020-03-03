@@ -1,0 +1,25 @@
+---
+- hosts: new_jenkins
+  become: true
+  vars:
+    jenkins_url: http://localhost:8080
+    jenkins_username: admin
+    jenkins_password: admin
+    approve_script: |
+      def scriptApproval = org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval.get()
+      String[] signs = [
+          "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses",
+          "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
+          ]
+
+      for( String sign : signs ) {
+          scriptApproval.approveSignature(sign)
+      }
+
+      scriptApproval.save()
+    
+    jenkins_script:
+      script: "{{ approve_script }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
