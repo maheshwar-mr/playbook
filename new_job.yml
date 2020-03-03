@@ -6,33 +6,7 @@
     jenkins_username: admin
     jenkins_password: admin
   tasks:
-
-  - name: Crumb Issuer
-    vars:
-      csrf_enable:  |
-        import hudson.security.csrf.DefaultCrumbIssuer
-        import jenkins.model.Jenkins
-
-        if(!Jenkins.instance.isQuietingDown()) {
-            def j = Jenkins.instance
-            if(j.getCrumbIssuer() == null) {
-                j.setCrumbIssuer(new DefaultCrumbIssuer(true))
-                j.save()
-                println 'CSRF Protection configuration has changed.  Enabled CSRF Protection.'
-            }
-            else {
-                println 'Nothing changed.  CSRF Protection already configured.'
-            }
-        }
-        else {
-            println "Shutdown mode enabled.  Configure CSRF protection SKIPPED."
-        }
-    jenkins_script:
-      script: "{{ csrf_enable }}"
-      url: "{{ jenkins_url }}"
-      user: "{{ jenkins_username }}"
-      password: "{{ jenkins_password }}"
-
+  
   - name: Create seed job
     vars:
       seed_name: seed
