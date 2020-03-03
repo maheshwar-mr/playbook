@@ -6,17 +6,24 @@
     jenkins_username: admin
     jenkins_password: admin
     approve_script: |
-      def scriptApproval = org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval.get()
-      String[] signs = [
-          "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses",
-          "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
-          ]
+      import jenkins.model.Jenkins
+      Jenkins j = Jenkins.instance
 
-      for( String sign : signs ) {
-          scriptApproval.approveSignature(sign)
+      if(!j.isQuietingDown()) {
+          def job_dsl_security = j.getExtensionList('javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration')[0]
+          if(job_dsl_security.useScriptSecurity) {
+              job_dsl_security.useScriptSecurity = false
+              println 'Job DSL script security has changed.  It is now disabled.'
+              job_dsl_security.save()
+              j.save()
+          }
+          else {
+              println 'Nothing changed.  Job DSL script security already disabled.'
+          }
       }
-
-      scriptApproval.save()
+      else {
+          println 'Shutdown mode enabled.  Configure Job DSL script security SKIPPED.'
+      }
     
     jenkins_script:
       script: "{{ approve_script }}"
