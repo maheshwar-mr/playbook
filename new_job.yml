@@ -27,7 +27,6 @@
       HEADER_Content-Type: application/xml
       body: "{{ seed_job }}"
     register: jenkins_seed_updated
-    when: not seed_exists
 
   - name: Run seed job
     uri:
