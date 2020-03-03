@@ -5,7 +5,6 @@
     jenkins_url: http://localhost:8080
     jenkins_username: admin 
     jenkins_password: admin
-    sonarScannerName: sonar
     maven_config: |
         import hudson.tasks.Maven.MavenInstallation;
         import hudson.tools.InstallSourceProperty;
