@@ -2,56 +2,56 @@
 - hosts: new_jenkins
   become: true
   vars:
-  job_name: seed
-  jenkins_url: http://localhost:8080
-  jenkins_user: admin
-  jenkins_password: admin
-  git_repository: git@github.com:maheshwar807/springboot-demo.git
-  
-  init_job_script:  |
-    import hudson.plugins.git.*
-    import hudson.plugins.git.extensions.*
-    import hudson.plugins.git.extensions.impl.*
-    import jenkins.model.Jenkins
+    job_name: seed
+    jenkins_url: http://localhost:8080
+    jenkins_user: admin
+    jenkins_password: admin
+    git_repository: git@github.com:maheshwar807/springboot-demo.git
 
-    // parameters
-    def jobParameters = [
-      name:          'Demo',
-      description:   '',
-      repository:    'git@github.com:my-company/my-repo.git',
-      branch:        'master',
-    ]
+    init_job_script:  |
+      import hudson.plugins.git.*
+      import hudson.plugins.git.extensions.*
+      import hudson.plugins.git.extensions.impl.*
+      import jenkins.model.Jenkins
 
-    // define repo configuration
-    def branchConfig                =   [new BranchSpec(jobParameters.branch)]
-    def userConfig                  =   [new UserRemoteConfig(jobParameters.repository, null, null, null]
-    def cleanBeforeCheckOutConfig   =   new CleanBeforeCheckout()
-    def sparseCheckoutPathConfig    =   new SparseCheckoutPaths([new SparseCheckoutPath("Jenkinsfile")])
-    def cloneConfig                 =   new CloneOption(true, true, null, 3)
-    def extensionsConfig            =   [cleanBeforeCheckOutConfig,sparseCheckoutPathConfig,cloneConfig]
-    def scm                         =   new GitSCM(userConfig, branchConfig, false, [], null, null, extensionsConfig)
+      // parameters
+      def jobParameters = [
+        name:          'Demo',
+        description:   '',
+        repository:    'git@github.com:my-company/my-repo.git',
+        branch:        'master',
+      ]
 
-    // define SCM flow
-    def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
+      // define repo configuration
+      def branchConfig                =   [new BranchSpec(jobParameters.branch)]
+      def userConfig                  =   [new UserRemoteConfig(jobParameters.repository, null, null, null]
+      def cleanBeforeCheckOutConfig   =   new CleanBeforeCheckout()
+      def sparseCheckoutPathConfig    =   new SparseCheckoutPaths([new SparseCheckoutPath("Jenkinsfile")])
+      def cloneConfig                 =   new CloneOption(true, true, null, 3)
+      def extensionsConfig            =   [cleanBeforeCheckOutConfig,sparseCheckoutPathConfig,cloneConfig]
+      def scm                         =   new GitSCM(userConfig, branchConfig, false, [], null, null, extensionsConfig)
 
-    // set lightweight checkout
-    flowDefinition.setLightweight(true)
+      // define SCM flow
+      def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
 
-    // get Jenkins instance
-    Jenkins jenkins = Jenkins.getInstance()
+      // set lightweight checkout
+      flowDefinition.setLightweight(true)
 
-    // create the job
-    def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(jenkins,jobParameters.name)
+      // get Jenkins instance
+      Jenkins jenkins = Jenkins.getInstance()
 
-    // define job type
-    job.definition = flowDefinition
+      // create the job
+      def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(jenkins,jobParameters.name)
 
-    // set job description
-    job.setDescription(jobParameters.description)
+      // define job type
+      job.definition = flowDefinition
 
-    // save to disk
-    jenkins.save()
-    jenkins.reload()
+      // set job description
+      job.setDescription(jobParameters.description)
+
+      // save to disk
+      jenkins.save()
+      jenkins.reload()
     
   jenkins_script:
     script: "{{ init_job_script }}"
