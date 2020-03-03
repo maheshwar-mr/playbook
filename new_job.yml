@@ -16,9 +16,9 @@
 
       // parameters
       def jobParameters = [
-        name:          "{{ job_name }}",
+        name:          'Demo',
         description:   '',
-        repository:    "{{ git repository }}",
+        repository:    'git@github.com:maheshwar807/springboot-demo.git',
         branch:        'master',
       ]
 
