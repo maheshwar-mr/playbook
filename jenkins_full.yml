@@ -2,6 +2,10 @@
 
 - hosts: new_jenkins
   become: true
+  vars:
+    jenkins_url: http://localhost:8080
+    jenkins_username: admin
+    jenkins_password: admin
   tasks:
   
   - name: Install wget
@@ -57,3 +61,74 @@
     ufw:
       rule: allow
       name: OpenSSH
+      
+  - name: Download CLI jar
+    get_url:
+      url: http://localhost:8080/jnlpJars/jenkins-cli.jar
+      dest: /opt/jenkins-cli.jar
+      
+  - name: Jenkins Initial Password
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    changed_when: false
+    register: init_password
+
+  - name: New User
+    shell: echo 'jenkins.model.Jenkins.instance.securityRealm.createAccount("{{ jenkins_username }}", "{{ jenkins_password }}")' | java -jar /opt/jenkins-cli.jar -s "{{ jenkins_url }}" -auth "{{ jenkins_username }}":"{{ init_password.stdout }}" -noKeyAuth groovy = – 
+    
+  - name: Skip Suggested Plugins Step
+    vars:
+      skip_plugins: |
+        import static jenkins.model.Jenkins.instance as jenkins
+        import jenkins.install.InstallState
+        if (!jenkins.installState.isSetupComplete()) {
+          println '--> Neutering SetupWizard'
+          InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+        }
+    jenkins_script:
+      script: "{{ skip_plugins }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_user }}"
+      password: "{{ jenkins_password }}"
+
+  - name: Install Suggested Plugins
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader
+
+  - name: Pause for Plugins to Install
+    pause:
+      minutes: 5
+
+  - name: Restart Jenkins
+    service:
+      name: jenkins
+      state: restarted
+      
+  - name: Configure Maven     
+    vars:
+      maven_config: |
+        import hudson.tasks.Maven.MavenInstallation;
+        import hudson.tools.InstallSourceProperty;
+        import hudson.tools.ToolProperty;
+        import hudson.tools.ToolPropertyDescriptor;
+        import hudson.util.DescribableList;
+
+        def mavenDesc = jenkins.model.Jenkins.instance.getExtensionList(hudson.tasks.Maven.DescriptorImpl.class)[0]
+
+        def isp = new InstallSourceProperty()
+        def autoInstaller = new hudson.tasks.Maven.MavenInstaller("3.6.3")
+        isp.installers.add(autoInstaller)
+
+        def proplist = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>()
+        proplist.add(isp)
+
+        def installation = new MavenInstallation("maven", "", proplist)
+
+        mavenDesc.setInstallations(installation)
+        mavenDesc.save()
+        
+    jenkins_script:
+      script: "{{ maven_config }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+      
+  
