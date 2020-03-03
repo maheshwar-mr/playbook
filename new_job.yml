@@ -1,62 +1,37 @@
 ---
 - hosts: new_jenkins
-  become: true
-  vars:
-    job_name: demo
-    jenkins_url: http://localhost:8080
-    jenkins_user: admin
-    jenkins_password: admin
-    git_repository: git@github.com:maheshwar807/springboot-demo.git
-
-    init_job_script:  |
-      import hudson.plugins.git.*
-      import hudson.plugins.git.extensions.*
-      import hudson.plugins.git.extensions.impl.*
-      import jenkins.model.Jenkins
-
-      // parameters
-      def jobParameters = [
-        name:          'Demo',
-        description:   '',
-        repository:    'git@github.com:maheshwar807/springboot-demo.git',
-        branch:        'master',
-      ]
-
-      // define repo configuration
-      def branchConfig                =   [new BranchSpec(jobParameters.branch)]
-      def userConfig                  =   [new UserRemoteConfig(jobParameters.repository, null, null, null]
-      def cleanBeforeCheckOutConfig   =   new CleanBeforeCheckout()
-      def sparseCheckoutPathConfig    =   new SparseCheckoutPaths([new SparseCheckoutPath("Jenkinsfile")])
-      def cloneConfig                 =   new CloneOption(true, true, null, 3)
-      def extensionsConfig            =   [cleanBeforeCheckOutConfig,sparseCheckoutPathConfig,cloneConfig]
-      def scm                         =   new GitSCM(userConfig, branchConfig, false, [], null, null, extensionsConfig)
-
-      // define SCM flow
-      def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
-
-      // set lightweight checkout
-      flowDefinition.setLightweight(true)
-
-      // get Jenkins instance
-      Jenkins jenkins = Jenkins.getInstance()
-
-      // create the job
-      def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(jenkins,jobParameters.name)
-
-      // define job type
-      job.definition = flowDefinition
-
-      // set job description
-      job.setDescription(jobParameters.description)
-
-      // save to disk
-      jenkins.save()
-      jenkins.reload()
-      
+  become: true   
   tasks:
-  - name: Creating a new Pipeline Job
-    jenkins_script:
-      script: "{{ init_job_script }}"
-      url: "{{ jenkins_url }}"
-      user: "{{ jenkins_user }}"
-      password: "{{ jenkins_password }}"
+  - name: Create seed job
+    vars:
+      seed_name: seed
+      
+      seed_job: |
+        pipelineJob('springboot-demo') {
+          definition {
+            cpsScm {
+              scm {
+                git('https://github.com/maheshwar807/springboot-demo.git'){node -> // is hudson.plugins.git.GitSCM
+                    node / gitConfigName('maheshwar807')
+                    node / gitConfigEmail('maheshwar.mannur@gmail.com')
+                  branch('master')
+                }
+              }
+              scriptPath('Jenkinsfile')
+            }
+          }
+        }
+    uri:
+      url: "http://localhost:8080/createItem?name={{ seed_name }}"
+      method: POST
+      HEADER_Content-Type: application/xml
+      body: "{{ seed_job }}"
+    register: jenkins_seed_updated
+    when: not seed_exists
+
+  - name: Run seed job
+    uri:
+      url: "http://localhost:8080/job/{{ seed_name }}/build"
+      method: POST
+      status_code: 201
+    when: jenkins_seed_updated|success
