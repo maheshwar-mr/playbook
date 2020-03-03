@@ -24,7 +24,8 @@
     uri:
       url: "http://localhost:8080/createItem?name={{ seed_name }}"
       method: POST
-      HEADER_Content-Type: application/xml
+      headers:
+        Content-Type: application/xml
       body: "{{ seed_job }}"
     register: jenkins_seed_updated
 
