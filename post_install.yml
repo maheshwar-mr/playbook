@@ -1,0 +1,36 @@
+---
+- hosts: new_jenkins
+  become: true
+  vars: 
+    jenkins_url: http://localhost:8080
+    jenkins_user: admin
+    jenkins_password: admin
+  tasks:
+  - name: Download CLI jar
+    get_url:
+      url: http://localhost:8080/jnlpJars/jenkins-cli.jar
+      dest: /opt/jenkins-cli.jar
+      
+  - name: Jenkins Initial Password
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    changed_when: false
+    register: init_password
+
+  - name: New User
+    shell: echo 'jenkins.model.Jenkins.instance.securityRealm.createAccount("{{ jenkins_user }}", "{{ jenkins_password }}")' | java -jar /opt/jenkins-cli.jar -s "{{ jenkins_url }}" -auth "{{ jenkins_user }}":"{{ init_password.stdout }}" -noKeyAuth groovy = – 
+    
+  - name: Skip Suggested Plugins Step
+    vars:
+      skip_plugins: |
+        import static jenkins.model.Jenkins.instance as jenkins
+        import jenkins.install.InstallState
+        if (!jenkins.installState.isSetupComplete()) {
+          println '--> Neutering SetupWizard'
+          InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+        }
+    jenkins_script:
+      script: "{{ skip_plugins }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_user }}"
+      password: "{{ jenkins_password }}"
+      
