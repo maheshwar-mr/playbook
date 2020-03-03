@@ -12,4 +12,4 @@
       dest: /opt/jenkins-cli.jar
       
   - name: Install Suggested Plugins
-    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin git github-oauth -auth "{{ jenkins_user }}":"{{ jenkins_password }}" -noKeyAuth groovy = –
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" -auth "{{ jenkins_user }}":"{{ jenkins_password }}" -noKeyAuth install-plugin git github-oauth -restart
