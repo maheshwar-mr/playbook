@@ -1,0 +1,32 @@
+---
+- hosts: new_jenkins
+  become: true
+  vars:
+    jenkins_url: http://localhost:8080
+    jenkins_username: admin
+    jenkins_password: admin
+    jenkins_jobName: seed
+    jenkins_gitPath: https://github.com/maheshwar807/job_dsl
+    job_script: |
+      import hudson.model.FreeStyleProject;
+      import hudson.plugins.git.GitSCM;
+      import hudson.plugins.git.BranchSpec;
+      import javaposse.jobsdsl.plugin.*;
+      jenkins = Jenkins.instance;
+      jobName = "{{ jenkins_jobName }}"
+      dslBuilder = new ExecuteDslScripts(scriptLocation=new ExecuteDslScripts.ScriptLocation(value = "false", targets="pipeline_job/demo.groovy", scriptText=""), ignoreExisting=false, removedJobAction=RemovedJobAction.DISABLE);
+      dslProject = new hudson.model.FreeStyleProject(jenkins, jobName);
+      dslProject.scm = new GitSCM("{{ jenkins_gitPath }}")
+      dslProject.scm.branches = [new BranchSpec("*/master")];
+      dslProject.createTransientActions();
+      dslProject.getPublishersList().add(dslBuilder);
+      jenkins.add(dslProject, jobName);
+      
+  tasks:
+  - name: Create new DSL job
+    jenkins_script:
+    script: "{{ job_script }}"
+    url: "{{ jenkins_url }}"
+    user: "{{ jenkins_username }}"
+    password: "{{ jenkins_password }}"
+  
