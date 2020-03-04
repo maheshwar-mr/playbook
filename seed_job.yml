@@ -47,6 +47,20 @@
       pause:
         seconds: 15
         
+    - name: Disable Script Approval
+      vars:
+        disable_script_approval:  |
+          import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+          import jenkins.model.GlobalConfiguration
+          
+          GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
+          GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+      jenkins_script:
+        script: "{{ disable_script_approval }}"
+        url: "{{ jenkins_url }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
+        
     - name: Queue Pipeline Job
       vars:
         pipelineJob_name: Springboot_demo
@@ -62,3 +76,17 @@
     - name: Waiting for Pipeline Job to start building
       pause:
         seconds: 15
+    
+    - name: Enable Script Approval
+      vars:
+        enable_script_approval:  |
+          import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+          import jenkins.model.GlobalConfiguration
+          
+          GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=true
+          GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+      jenkins_script:
+        script: "{{ enable_script_approval }}"
+        url: "{{ jenkins_url }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
