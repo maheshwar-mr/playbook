@@ -27,7 +27,7 @@
       dslBuilder.setRemovedJobAction(RemovedJobAction.DISABLE);
 
       dslProject = new hudson.model.FreeStyleProject(jenkins, jobName);
-      dslProject.scm = new GitSCM("{{ jenkins_gitPath }});
+      dslProject.scm = new GitSCM("{{ jenkins_gitPath }}");
       dslProject.scm.branches = [new BranchSpec("*/master")];
       dslProject.createTransientActions();
       dslProject.getPublishersList().add(dslBuilder);
