@@ -36,10 +36,29 @@
       hudson.model.Hudson.instance.queue.schedule(job);
            
   tasks:
-    - name: Create new DSL job
+    - name: Create new DSL Job
       jenkins_script:
         script: "{{ job_script }}"
         url: "{{ jenkins_url }}"
         user: "{{ jenkins_username }}"
         password: "{{ jenkins_password }}"
-
+        
+    - name: Waiting for seed job to be created
+      pause:
+        seconds: 15
+        
+    - name: Queue Pipeline Job
+      vars:
+        pipelineJob_name: Springboot_demo
+        queue_script: |
+          def job = hudson.model.Hudson.instance.getJob("{{ pipelineJob_name }}");
+          hudson.model.Hudson.instance.instance.queue.schedule(job);
+      jenkins_script:
+        script: "{{ queue_script }}"
+        url: "{{ jenkins_url }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
+    
+    - name: Waiting for Pipeline Job to start building
+      pause:
+        seconds: 15
