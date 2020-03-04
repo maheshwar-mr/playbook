@@ -25,8 +25,8 @@
   tasks:
     - name: Create new DSL job
       jenkins_script:
-      script: "{{ job_script }}"
-      url: "{{ jenkins_url }}"
-      user: "{{ jenkins_username }}"
-      password: "{{ jenkins_password }}"
+        script: "{{ job_script }}"
+        url: "{{ jenkins_url }}"
+        user: "{{ jenkins_username }}"
+        password: "{{ jenkins_password }}"
 
