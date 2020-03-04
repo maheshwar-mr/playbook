@@ -12,6 +12,7 @@
       import hudson.plugins.git.GitSCM;
       import hudson.plugins.git.BranchSpec;
       import javaposse.jobsdsl.plugin.*;
+      import hudson.model.*;
       jenkins = Jenkins.instance;
       jobName = "{{ jenkins_jobName }}"
       dslBuilder = new ExecuteDslScripts(scriptLocation=new ExecuteDslScripts.ScriptLocation(value = "false", targets="pipeline_job/demo.groovy", scriptText=""), ignoreExisting=false, removedJobAction=RemovedJobAction.DISABLE);
@@ -21,6 +22,8 @@
       dslProject.createTransientActions();
       dslProject.getPublishersList().add(dslBuilder);
       jenkins.add(dslProject, jobName);
+      def job = hudson.model.Hudson.instance.getJob("{{ jenkins_jobName }}");
+      hudson.model.Hudson.instance.queue.schedule(job);
       
   tasks:
     - name: Create new DSL job
