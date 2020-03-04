@@ -63,7 +63,7 @@
           def desc_SonarRunnerInst = instance.getDescriptor("hudson.plugins.sonar.SonarRunnerInstallation")
           def sonarRunnerInstaller = new SonarRunnerInstaller(sonar_runner_version)
           def installSourceProperty = new InstallSourceProperty([sonarRunnerInstaller])
-          def sonarRunner_inst = new SonarRunnerInstallation(sonar_runner_name + sonar_runner_version, "", [installSourceProperty])
+          def sonarRunner_inst = new SonarRunnerInstallation('sonar', "", [installSourceProperty])
 
           // Only add our Sonar Runner if it does not exist - do not overwrite existing config
           def sonar_runner_installations = desc_SonarRunnerInst.getInstallations()
