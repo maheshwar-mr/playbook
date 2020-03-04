@@ -7,24 +7,34 @@
     jenkins_password: admin
     jenkins_jobName: seed
     jenkins_gitPath: https://github.com/maheshwar807/job_dsl
+    jenkins_groovyPath: pipeline_job/demo.groovy
     job_script: |
       import hudson.model.FreeStyleProject;
       import hudson.plugins.git.GitSCM;
       import hudson.plugins.git.BranchSpec;
-      import javaposse.jobsdsl.plugin.*;
+      import javaposse.jobdsl.plugin.ExecuteDslScripts;
+      import javaposse.jobdsl.plugin.RemovedJobAction;
       import hudson.model.*;
       jenkins = Jenkins.instance;
       jobName = "{{ jenkins_jobName }}"
-      dslBuilder = new ExecuteDslScripts(scriptLocation=new ExecuteDslScripts.ScriptLocation(value = "false", targets="pipeline_job/demo.groovy", scriptText=""), ignoreExisting=false, removedJobAction=RemovedJobAction.DISABLE);
+
+      dslBuilder = new ExecuteDslScripts();
+      dslBuilder.setTargets("{{ jenkins_groovyPath }}");
+      dslBuilder.setScriptText("");
+      dslBuilder.setUseScriptText(false);
+      dslBuilder.setIgnoreExisting(false);
+      dslBuilder.setFailOnSeedCollision(true);
+      dslBuilder.setRemovedJobAction(RemovedJobAction.DISABLE);
+
       dslProject = new hudson.model.FreeStyleProject(jenkins, jobName);
-      dslProject.scm = new GitSCM("{{ jenkins_gitPath }}")
+      dslProject.scm = new GitSCM("{{ jenkins_gitPath }});
       dslProject.scm.branches = [new BranchSpec("*/master")];
       dslProject.createTransientActions();
       dslProject.getPublishersList().add(dslBuilder);
       jenkins.add(dslProject, jobName);
       def job = hudson.model.Hudson.instance.getJob("{{ jenkins_jobName }}");
       hudson.model.Hudson.instance.queue.schedule(job);
-      
+           
   tasks:
     - name: Create new DSL job
       jenkins_script:
