@@ -20,7 +20,7 @@
       def sonar_triggers = new TriggersConfig()
       def sonar_additional_analysis_properties = ''
       def sonar_runner_name = 'SonarQube Scanner '
-      def sonar_runner_version = '8.0'
+      def sonar_runner_version = '4.2.0.1873'
 
       def instance = Jenkins.getInstance()
 
