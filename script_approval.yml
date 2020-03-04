@@ -6,12 +6,12 @@
     jenkins_username: admin
     jenkins_password: admin
     approve_script: |
-     import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
-    import jenkins.model.GlobalConfiguration
+      import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+      import jenkins.model.GlobalConfiguration
 
-    // Disable Job DSL script approval
-    GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
-    GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+      // Disable Job DSL script approval
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
 
     
     jenkins_script:
