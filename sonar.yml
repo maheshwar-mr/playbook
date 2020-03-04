@@ -13,14 +13,14 @@
       import hudson.tools.*
 
       def sonar_name = "sonarqube"
-      def sonar_server_url = "159.89.166.25"
-      def sonar_auth_token = "ads423dffdas324545435"
+      def sonar_server_url = "68.183.88.103"
+      def sonar_auth_token = ""
       def sonar_mojo_version = ''
       def sonar_additional_properties = ''
       def sonar_triggers = new TriggersConfig()
       def sonar_additional_analysis_properties = ''
       def sonar_runner_name = 'SonarQube Scanner '
-      def sonar_runner_version = '2.8'
+      def sonar_runner_version = '8.0'
 
       def instance = Jenkins.getInstance()
 
