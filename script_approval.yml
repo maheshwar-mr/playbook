@@ -13,7 +13,8 @@
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
 
-    
+  tasks:
+  - name: Disable Script Security
     jenkins_script:
       script: "{{ approve_script }}"
       url: "{{ jenkins_url }}"
