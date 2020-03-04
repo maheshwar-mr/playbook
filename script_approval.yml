@@ -6,12 +6,21 @@
     jenkins_username: admin
     jenkins_password: admin
     approve_script: |
-      import jenkins.model.Jenkins
-      def scriptApproval = Jenkins.instance.getExtensionList('org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval')[0]
-      def hashesToApprove = scriptApproval.pendingScripts.findAll{ it.script.startsWith(approvalPrefix) }.collect{ it.getHash() }
-      hashesToApprove.each { 
-        scriptApproval.approveScript(it)
-      }
+      import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+      import jenkins.model.GlobalConfiguration
+      import org.kohsuke.stapler.StaplerRequest
+
+      // current value  
+      println GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity
+
+      // change vaue
+      StaplerRequest stapler = null
+      net.sf.json.JSONObject jsonObject = new net.sf.json.JSONObject()
+      //jsonObject.put("useScriptSecurity", false)  // it uses has method https://github.com/jenkinsci/job-dsl-plugin/blob/6a70bba91e671ebe72fd682e92e9abea48a2b050/job-dsl-plugin/src/main/groovy/javaposse/jobdsl/plugin/GlobalJobDslSecurityConfiguration.groovy#L21
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).configure(stapler, jsonObject)
+
+      // new value
+      println GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity
     
     jenkins_script:
       script: "{{ approve_script }}"
