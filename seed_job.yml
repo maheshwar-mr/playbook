@@ -43,10 +43,6 @@
         user: "{{ jenkins_username }}"
         password: "{{ jenkins_password }}"
         
-    - name: Waiting for seed job to be created
-      pause:
-        seconds: 15
-        
     - name: Disable Script Approval
       vars:
         disable_script_approval:  |
@@ -60,6 +56,10 @@
         url: "{{ jenkins_url }}"
         user: "{{ jenkins_username }}"
         password: "{{ jenkins_password }}"
+        
+    - name: Waiting for seed job to be created
+      pause:
+        seconds: 15
         
     - name: Queue Pipeline Job
       vars:
