@@ -181,15 +181,6 @@
       state=started
       enabled=yes
 
-  - name: Jenkins Initial Password
-    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
-    changed_when: false
-    register: result
-
-  - name: Print Jenkins Initial Password
-    debug:
-      var: result.stdout
-
   - name: Enable Firewall
     ufw:
       state: enabled
