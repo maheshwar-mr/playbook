@@ -221,7 +221,7 @@
     jenkins_script:
       script: "{{ skip_plugins }}"
       url: "{{ jenkins_url }}"
-      user: "{{ jenkins_user }}"
+      user: "{{ jenkins_username }}"
       password: "{{ jenkins_password }}"
 
   - name: Install Suggested Plugins
