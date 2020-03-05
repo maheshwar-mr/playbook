@@ -200,9 +200,9 @@
       name: jenkins
       state: restarted
       
-  - name: Wait for 3 minutes
+  - name: Wait for 1 minutes
     pause:
-      minutes: 3
+      minutes: 1
       
   - name: Download CLI jar
     get_url:
