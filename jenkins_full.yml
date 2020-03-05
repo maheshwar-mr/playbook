@@ -1,13 +1,155 @@
 ---
-
-- hosts: new_jenkins
+- hosts: jenkins1
   become: true
   vars:
     jenkins_url: http://localhost:8080
     jenkins_username: admin
     jenkins_password: admin
-  tasks:
+    jenkins_jobName: seed
+    jenkins_gitPath: https://github.com/maheshwar807/job_dsl
+    jenkins_groovyPath: pipeline_job/demo.groovy
+    pipelineJob_name: Springboot_demo
+    enable_script_approval:  |
+      import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+      import jenkins.model.GlobalConfiguration
+
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=true
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+    skip_plugins: |
+      import static jenkins.model.Jenkins.instance as jenkins
+      import jenkins.install.InstallState
+      if (!jenkins.installState.isSetupComplete()) {
+        println '--> Neutering SetupWizard'
+        InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+      }
+    disable_script_approval:  |
+      import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+      import jenkins.model.GlobalConfiguration
+
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
+      GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+    
+    queue_script: |
+      def job = hudson.model.Hudson.instance.getJob("{{ pipelineJob_name }}");
+      hudson.model.Hudson.instance.instance.queue.schedule(job);
+    
+    job_script: |
+      import hudson.model.FreeStyleProject;
+      import hudson.plugins.git.GitSCM;
+      import hudson.plugins.git.BranchSpec;
+      import javaposse.jobdsl.plugin.ExecuteDslScripts;
+      import javaposse.jobdsl.plugin.RemovedJobAction;
+      import hudson.model.*;
+      jenkins = Jenkins.instance;
+      jobName = "{{ jenkins_jobName }}"
+      dslBuilder = new ExecuteDslScripts();
+      dslBuilder.setTargets("{{ jenkins_groovyPath }}");
+      dslBuilder.setScriptText("");
+      dslBuilder.setUseScriptText(false);
+      dslBuilder.setIgnoreExisting(false);
+      dslBuilder.setFailOnSeedCollision(true);
+      dslBuilder.setRemovedJobAction(RemovedJobAction.DISABLE);
+      dslProject = new hudson.model.FreeStyleProject(jenkins, jobName);
+      dslProject.scm = new GitSCM("{{ jenkins_gitPath }}");
+      dslProject.scm.branches = [new BranchSpec("*/master")];
+      dslProject.createTransientActions();
+      dslProject.getPublishersList().add(dslBuilder);
+      jenkins.add(dslProject, jobName);
+      def job = hudson.model.Hudson.instance.getJob("{{ jenkins_jobName }}");
+      hudson.model.Hudson.instance.queue.schedule(job);
+    
+    sonar_config: |
+          import hudson.model.*
+          import jenkins.model.*
+          import hudson.plugins.sonar.*
+          import hudson.plugins.sonar.model.TriggersConfig
+          import hudson.tools.*
+          def sonar_name = "sonarqube"
+          def sonar_server_url = "http://68.183.88.103:9000"
+          def sonar_auth_token = ""
+          def sonar_mojo_version = ''
+          def sonar_additional_properties = ''
+          def sonar_triggers = new TriggersConfig()
+          def sonar_additional_analysis_properties = ''
+          def sonar_runner_name = 'SonarQube Scanner '
+          def sonar_runner_version = '4.2.0.1873'
+          def instance = Jenkins.getInstance()
+          Thread.start {
+              sleep(1000)
+              println("Configuring SonarQube...")
+              // Get the GlobalConfiguration descriptor of SonarQube plugin.
+              def SonarGlobalConfiguration sonar_conf = instance.getDescriptor(SonarGlobalConfiguration.class)
+              def sonar_inst = new SonarInstallation(
+                  sonar_name,
+                  sonar_server_url,
+                  sonar_auth_token,
+                  sonar_mojo_version,
+                  sonar_additional_properties,
+                  sonar_triggers,
+                  sonar_additional_analysis_properties
+              )
+              // Only add the new Sonar setting if it does not exist - do not overwrite existing config
+              def sonar_installations = sonar_conf.getInstallations()
+              def sonar_inst_exists = false
+              sonar_installations.each {
+                  installation = (SonarInstallation) it
+                  if (sonar_inst.getName() == installation.getName()) {
+                      sonar_inst_exists = true
+                      println("Found existing installation: " + installation.getName())
+                  }
+              }
+              if (!sonar_inst_exists) {
+                  sonar_installations += sonar_inst
+                  sonar_conf.setInstallations((SonarInstallation[]) sonar_installations)
+                  sonar_conf.save()
+              }
+              // Step 2 - Configure SonarRunner
+              println("Configuring SonarRunner...")
+              def desc_SonarRunnerInst = instance.getDescriptor("hudson.plugins.sonar.SonarRunnerInstallation")
+              def sonarRunnerInstaller = new SonarRunnerInstaller(sonar_runner_version)
+              def installSourceProperty = new InstallSourceProperty([sonarRunnerInstaller])
+              def sonarRunner_inst = new SonarRunnerInstallation('sonar', "", [installSourceProperty])
+              // Only add our Sonar Runner if it does not exist - do not overwrite existing config
+              def sonar_runner_installations = desc_SonarRunnerInst.getInstallations()
+              def sonar_runner_inst_exists = false
+              sonar_runner_installations.each {
+                  installation = (SonarRunnerInstallation) it
+                  if (sonarRunner_inst.getName() == installation.getName()) {
+                      sonar_runner_inst_exists = true
+                      println("Found existing installation: " + installation.getName())
+                  }
+              }
+              if (!sonar_runner_inst_exists) {
+                  sonar_runner_installations += sonarRunner_inst
+                  desc_SonarRunnerInst.setInstallations((SonarRunnerInstallation[]) sonar_runner_installations)
+                  desc_SonarRunnerInst.save()
+              }
+              // Save the state
+              instance.save()
+          }
+    
+    maven_config: |
+        import hudson.tasks.Maven.MavenInstallation;
+        import hudson.tools.InstallSourceProperty;
+        import hudson.tools.ToolProperty;
+        import hudson.tools.ToolPropertyDescriptor;
+        import hudson.util.DescribableList;
+
+        def mavenDesc = jenkins.model.Jenkins.instance.getExtensionList(hudson.tasks.Maven.DescriptorImpl.class)[0]
+
+        def isp = new InstallSourceProperty()
+        def autoInstaller = new hudson.tasks.Maven.MavenInstaller("3.6.3")
+        isp.installers.add(autoInstaller)
+
+        def proplist = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>()
+        proplist.add(isp)
+
+        def installation = new MavenInstallation("maven", "", proplist)
+
+        mavenDesc.setInstallations(installation)
+        mavenDesc.save()
   
+  tasks:
   - name: Install wget
     apt:
       name: wget
@@ -76,14 +218,6 @@
     shell: echo 'jenkins.model.Jenkins.instance.securityRealm.createAccount("{{ jenkins_username }}", "{{ jenkins_password }}")' | java -jar /opt/jenkins-cli.jar -s "{{ jenkins_url }}" -auth "{{ jenkins_username }}":"{{ init_password.stdout }}" -noKeyAuth groovy = – 
     
   - name: Skip Suggested Plugins Step
-    vars:
-      skip_plugins: |
-        import static jenkins.model.Jenkins.instance as jenkins
-        import jenkins.install.InstallState
-        if (!jenkins.installState.isSetupComplete()) {
-          println '--> Neutering SetupWizard'
-          InstallState.INITIAL_SETUP_COMPLETED.initializeState()
-        }
     jenkins_script:
       script: "{{ skip_plugins }}"
       url: "{{ jenkins_url }}"
@@ -95,7 +229,7 @@
 
   - name: Pause for Plugins to Install
     pause:
-      minutes: 5
+      minutes: 1
 
   - name: Restart Jenkins
     service:
@@ -103,32 +237,49 @@
       state: restarted
       
   - name: Configure Maven     
-    vars:
-      maven_config: |
-        import hudson.tasks.Maven.MavenInstallation;
-        import hudson.tools.InstallSourceProperty;
-        import hudson.tools.ToolProperty;
-        import hudson.tools.ToolPropertyDescriptor;
-        import hudson.util.DescribableList;
-
-        def mavenDesc = jenkins.model.Jenkins.instance.getExtensionList(hudson.tasks.Maven.DescriptorImpl.class)[0]
-
-        def isp = new InstallSourceProperty()
-        def autoInstaller = new hudson.tasks.Maven.MavenInstaller("3.6.3")
-        isp.installers.add(autoInstaller)
-
-        def proplist = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>()
-        proplist.add(isp)
-
-        def installation = new MavenInstallation("maven", "", proplist)
-
-        mavenDesc.setInstallations(installation)
-        mavenDesc.save()
-        
     jenkins_script:
       script: "{{ maven_config }}"
       url: "{{ jenkins_url }}"
       user: "{{ jenkins_username }}"
       password: "{{ jenkins_password }}"
       
+  - name: Configure SonarQube     
+    jenkins_script:
+      script: "{{ sonar_config }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+      
+  - name: Create new DSL Job
+    jenkins_script:
+      script: "{{ job_script }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+        
+  - name: Disable Script Approval
+    jenkins_script:
+      script: "{{ disable_script_approval }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+      
+  - name: Queue Pipeline Job
+    jenkins_script:
+      script: "{{ queue_script }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+      
+  - name: Waiting for Pipeline Job to start building
+    pause:
+      seconds: 15
+  
+  - name: Enable Script Approval  
+    jenkins_script:
+      script: "{{ enable_script_approval }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+
   
