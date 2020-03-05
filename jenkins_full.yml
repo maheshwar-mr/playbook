@@ -200,9 +200,9 @@
       name: jenkins
       state: restarted
       
-  - name: Wait for 5 minutes
+  - name: Wait for 3 minutes
     pause:
-      minutes: 5
+      minutes: 3
       
   - name: Download CLI jar
     get_url:
@@ -226,16 +226,11 @@
 
   - name: Install Required Plugins
     shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" -auth "{{ jenkins_username }}":"{{ jenkins_password }}" -noKeyAuth install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader -restart
-
-  - name: Wait for Plugins to Install
+ 
+  - name: Wait for a minute
     pause:
       minutes: 1
-
-  - name: Restart Jenkins
-    service:
-      name: jenkins
-      state: restarted
-      
+  
   - name: Configure Maven     
     jenkins_script:
       script: "{{ maven_config }}"
