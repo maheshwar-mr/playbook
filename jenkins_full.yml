@@ -202,7 +202,7 @@
       
   - name: Wait for 10 minutes
     pause:
-      minutes: 10
+      minutes: 5
       
   - name: Download CLI jar
     get_url:
