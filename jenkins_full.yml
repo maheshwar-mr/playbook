@@ -12,9 +12,9 @@
     enable_script_approval:  |
       import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
       import jenkins.model.GlobalConfiguration
-
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=true
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+    
     skip_plugins: |
       import static jenkins.model.Jenkins.instance as jenkins
       import jenkins.install.InstallState
@@ -22,10 +22,10 @@
         println '--> Neutering SetupWizard'
         InstallState.INITIAL_SETUP_COMPLETED.initializeState()
       }
+    
     disable_script_approval:  |
       import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
       import jenkins.model.GlobalConfiguration
-
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
       GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
     
@@ -204,6 +204,10 @@
       rule: allow
       name: OpenSSH
       
+  - name: Wait for a minute
+    pause:
+      minute: 1
+      
   - name: Download CLI jar
     get_url:
       url: http://localhost:8080/jnlpJars/jenkins-cli.jar
@@ -225,7 +229,7 @@
       password: "{{ jenkins_password }}"
 
   - name: Install Suggested Plugins
-    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader
+    shell: java -jar /opt/jenkins-cli.jar  -s "{{ jenkins_url }}" -auth "{{ jenkins_username }}":"{{ jenkins_password }}" -noKeyAuth install-plugin cloudbees-folder timestamper pipeline-model-definition subversion ldap antisamy-markup-formatter ws-cleanup github-organization-folder ssh-slaves email-ext build-timeout ant pipeline-stage-view matrix-auth mailer credentials-binding gradle git pam-auth github-oauth job-dsl sonar nexus-artifact-uploader -restart
 
   - name: Pause for Plugins to Install
     pause:
