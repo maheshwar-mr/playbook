@@ -65,7 +65,7 @@
           import hudson.plugins.sonar.model.TriggersConfig
           import hudson.tools.*
           def sonar_name = "sonarqube"
-          def sonar_server_url = "http://68.183.88.103:9000"
+          def sonar_server_url = "http://134.209.153.55:9000"
           def sonar_auth_token = ""
           def sonar_mojo_version = ''
           def sonar_additional_properties = ''
