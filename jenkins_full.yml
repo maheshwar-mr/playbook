@@ -301,5 +301,9 @@
       url: "{{ jenkins_url }}"
       user: "{{ jenkins_username }}"
       password: "{{ jenkins_password }}"
+      
+  - name: Create Sonarqube Webhook
+    shell:
+      cmd: curl -X POST -u "admin:admin" -d "name=jenkins" -d 'url="{{ jenkins_url }}"/sonarqube-webhook' '"{{ sonarqube_url }}"/api/webhooks/create'
 
   
