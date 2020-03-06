@@ -9,6 +9,7 @@
     jenkins_gitPath: https://github.com/maheshwar807/job_dsl
     jenkins_groovyPath: pipeline_job/demo.groovy
     pipelineJob_name: Springboot_demo
+    sonarqube_url: http://134.209.153.55:9000
     nexus_username: admin
     nexus_password: admin
     nexus_id: Nexus
@@ -83,7 +84,7 @@
           import hudson.plugins.sonar.model.TriggersConfig
           import hudson.tools.*
           def sonar_name = "sonarqube"
-          def sonar_server_url = "http://134.209.153.55:9000"
+          def sonar_server_url = "{{ sonarqube_url }}"
           def sonar_auth_token = ""
           def sonar_mojo_version = ''
           def sonar_additional_properties = ''
@@ -304,6 +305,4 @@
       
   - name: Create Sonarqube Webhook
     shell:
-      cmd: curl -X POST -u "admin:admin" -d "name=jenkins" -d 'url="{{ jenkins_url }}"/sonarqube-webhook' '"{{ sonarqube_url }}"/api/webhooks/create'
-
-  
+      cmd: curl -X POST -u 'admin:admin' -d 'name=jenkins' -d 'url={{ jenkins_url }}/sonarqube-webhook' '{{ sonarqube_url }}/api/webhooks/create'
