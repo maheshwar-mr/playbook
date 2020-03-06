@@ -9,6 +9,24 @@
     jenkins_gitPath: https://github.com/maheshwar807/job_dsl
     jenkins_groovyPath: pipeline_job/demo.groovy
     pipelineJob_name: Springboot_demo
+    nexus_username: admin
+    nexus_password: admin
+    nexus_id: Nexus
+    nexus_description: Nexus Credentials
+    
+    add_credentials:  |
+      import com.cloudbees.plugins.credentials.*
+      import com.cloudbees.plugins.credentials.domains.Domain
+      import com.cloudbees.jenkins.plugins.sshcredentials.impl.*
+      import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
+      import hudson.util.Secret
+      import jenkins.model.*
+      import hudson.security.*
+      domain = Domain.global()
+      store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+      GITHUB_USER = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"{{ nexus_id }}", "{{ nexus_description }}","{{ nexus_username }}","{{ nexus_password }}")
+      store.addCredentials(domain, GITHUB_USER)
+    
     enable_script_approval:  |
       import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
       import jenkins.model.GlobalConfiguration
@@ -273,6 +291,13 @@
   - name: Enable Script Approval  
     jenkins_script:
       script: "{{ enable_script_approval }}"
+      url: "{{ jenkins_url }}"
+      user: "{{ jenkins_username }}"
+      password: "{{ jenkins_password }}"
+      
+  - name: Creating Nexus Credentials
+    jenkins_script:
+      script: "{{ add_credentials }}"
       url: "{{ jenkins_url }}"
       user: "{{ jenkins_username }}"
       password: "{{ jenkins_password }}"
