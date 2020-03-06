@@ -1,0 +1,12 @@
+---
+- hosts: jenkins
+  become: true
+  vars:
+    jenkins_url: http://142.93.216.147:8080
+    sonarqube_url: http://134.209.153.55:9000
+  tasks:  
+  - name: Create Sonarqube Webhook
+        shell:
+          cmd: curl -X POST -u "admin:admin" -d "name=jenkins1" -d 'url="{{ jenkins_url }}"/sonarqube-webhook' '"{{ sonarqube_url }}"/api/webhooks/create'
+
+  
