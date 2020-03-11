@@ -13,7 +13,7 @@
       import static jenkins.plugins.nodejs.tools.NodeJSInstaller.DEFAULT_NPM_PACKAGES_REFRESH_HOURS
 
       final versions = [
-              'NodeJS 8.x': '8.16.1'
+              'node': '10.15.0'
       ]
 
       Jenkins.instance.getDescriptor(NodeJSInstallation).with {
